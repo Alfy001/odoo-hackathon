@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String
+  trips     Trip[]
+  createdAt DateTime @default(now())
+}
+
+model Trip {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isPublic    Boolean  @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  stops   TripStop[]
+  budget  TripBudget?
+  shares  TripShare[]
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model City {
+  id              Int    @id @default(autoincrement())
+  name            String
+  country         String
+  costIndex       Int?
+  popularityScore Int?
+
+  activities Activity[]
+  stops      TripStop[]
+}
+
+model TripStop {
+  id        String   @id @default(uuid())
+  startDate DateTime?
+  endDate   DateTime?
+  order     Int
+
+  tripId String
+  trip   Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  cityId Int
+  city   City @relation(fields: [cityId], references: [id])
+
+  activities TripActivity[]
+
+  @@index([tripId])
+}
+
+model Activity {
+  id            Int     @id @default(autoincrement())
+  name          String
+  type          String?
+  avgCost       Decimal?
+  durationHours Int?
+
+  cityId Int
+  city   City @relation(fields: [cityId], references: [id])
+
+  tripActivities TripActivity[]
+}
+
+model TripActivity {
+  id            String   @id @default(uuid())
+  scheduledDate DateTime?
+  customCost    Decimal?
+
+  tripStopId String
+  tripStop   TripStop @relation(fields: [tripStopId], references: [id], onDelete: Cascade)
+
+  activityId Int
+  activity   Activity @relation(fields: [activityId], references: [id])
+}
+
+model TripBudget {
+  tripId String @id
+  trip   Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  transportCost Decimal?
+  stayCost      Decimal?
+  foodCost      Decimal?
+  activityCost  Decimal?
+}
+
+model TripShare {
+  id         String @id @default(uuid())
+  email      String
+  permission String
+
+  tripId String
+  trip   Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
