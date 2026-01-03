@@ -4,7 +4,7 @@ import { Plus, Filter, LayoutGrid, ListFilter, Calendar, ArrowRight, Search, X, 
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import PlaceCard from '../components/PlaceCard';
-import { searchPlaces, type Place } from '../services/api';
+import { searchPlaces, getUserTrips, type Place, type Trip } from '../services/api';
 import '../styles/Dashboard.css';
 
 // --- Local Components ---
@@ -22,12 +22,14 @@ const RegionCard = ({ name, image, delay }: { name: string, image: string, delay
     </motion.div>
 );
 
-const TripCard = ({ title, status, date, image, delay }: { title: string, status: string, date: string, image: string, delay: number }) => (
+const TripCard = ({ title, status, date, image, delay, onClick }: { title: string, status: string, date: string, image: string, delay: number, onClick?: () => void }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay, duration: 0.5 }}
         className="trip-card"
+        onClick={onClick}
+        style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
         <img src={image} alt={title} className="trip-image" />
         <div className="trip-content">
@@ -39,7 +41,10 @@ const TripCard = ({ title, status, date, image, delay }: { title: string, status
                 <Calendar size={14} />
                 <span>{date}</span>
             </div>
-            <button style={{ marginTop: '1.5rem', background: 'transparent', color: 'var(--primary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+                onClick={(e) => { e.stopPropagation(); onClick?.(); }}
+                style={{ marginTop: '1.5rem', background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: 0 }}
+            >
                 View Details <ArrowRight size={16} />
             </button>
         </div>
@@ -50,6 +55,9 @@ const TripCard = ({ title, status, date, image, delay }: { title: string, status
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const [user, setUser] = useState<{ id: string } | null>(null);
+    const [recentTrips, setRecentTrips] = useState<Trip[]>([]);
+    const [isLoadingTrips, setIsLoadingTrips] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Place[]>([]);
@@ -59,8 +67,28 @@ const LandingPage = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 1200);
+
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            const userData = JSON.parse(userStr);
+            setUser(userData);
+            fetchRecentTrips(userData.id);
+        }
+
         return () => clearTimeout(timer);
     }, []);
+
+    const fetchRecentTrips = async (userId: string) => {
+        setIsLoadingTrips(true);
+        try {
+            const trips = await getUserTrips(userId, { sortBy: 'createdAt', limit: 3 });
+            setRecentTrips(trips);
+        } catch (error) {
+            console.error('Failed to fetch recent trips:', error);
+        } finally {
+            setIsLoadingTrips(false);
+        }
+    };
 
     const handleSearch = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -95,7 +123,10 @@ const LandingPage = () => {
 
     const handlePlaceClick = (place: Place) => {
         console.log('Selected place:', place);
-        // TODO: Navigate to place details or add to trip
+    };
+
+    const handleViewTrip = (tripId: string) => {
+        navigate(`/trip/${tripId}`);
     };
 
     const regions = [
@@ -104,12 +135,6 @@ const LandingPage = () => {
         { name: 'Swiss Alps', image: '/alps.png' },
         { name: 'Safari', image: '/safari.png' },
         { name: 'Santorini', image: '/banner.png' },
-    ];
-
-    const trips = [
-        { title: 'Summer in Kyoto', status: 'Completed', date: 'June 2025', image: '/tokyo.png' },
-        { title: 'Parisian Escape', status: 'Upcoming', date: 'Dec 2025', image: '/paris.png' },
-        { title: 'Swiss Adventure', status: 'Upcoming', date: 'Jan 2026', image: '/alps.png' },
     ];
 
     if (isLoading) {
@@ -385,15 +410,103 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Previous Trips */}
-            <section style={{ marginTop: '2rem' }}>
-                <h2 className="section-title">Previous Trips</h2>
-                <div className="trips-grid">
-                    {trips.map((trip, idx) => (
-                        <TripCard key={trip.title} {...trip} delay={0.4 + idx * 0.1} />
-                    ))}
-                </div>
-            </section>
+            {/* Recent Trips Section */}
+            {user && (
+                <section style={{ marginTop: '2rem' }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '1.5rem',
+                        padding: '0 5rem',
+                    }}>
+                        <h2 className="section-title" style={{ margin: 0 }}>Your Recent Trips</h2>
+                        <motion.button
+                            whileHover={{ x: 5 }}
+                            onClick={() => navigate('/my-trips')}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                color: 'var(--primary)',
+                                fontWeight: '600',
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            View All <ArrowRight size={16} />
+                        </motion.button>
+                    </div>
+
+                    {isLoadingTrips ? (
+                        <div style={{ padding: '0 5rem', display: 'flex', gap: '1.5rem' }}>
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="skeleton" style={{ flex: 1, height: '200px', borderRadius: '20px', background: 'rgba(255,255,255,0.03)' }}></div>
+                            ))}
+                        </div>
+                    ) : recentTrips.length > 0 ? (
+                        <div className="trips-grid">
+                            {recentTrips.map((trip, idx) => {
+                                const now = new Date();
+                                const start = trip.startDate ? new Date(trip.startDate) : null;
+                                const end = trip.endDate ? new Date(trip.endDate) : null;
+                                let status = 'Upcoming';
+                                if (start && end) {
+                                    if (now >= start && now <= end) status = 'Ongoing';
+                                    else if (now > end) status = 'Completed';
+                                }
+
+                                const dateRange = trip.startDate
+                                    ? `${new Date(trip.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
+                                    : 'Dates TBD';
+
+                                return (
+                                    <TripCard
+                                        key={trip.id}
+                                        title={trip.title}
+                                        status={status}
+                                        date={dateRange}
+                                        image={idx % 2 === 0 ? '/paris.png' : '/alps.png'}
+                                        delay={0.4 + idx * 0.1}
+                                        onClick={() => handleViewTrip(trip.id)}
+                                    />
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div style={{ padding: '0 5rem' }}>
+                            <div style={{
+                                padding: '3rem',
+                                background: 'rgba(255, 255, 255, 0.02)',
+                                borderRadius: '24px',
+                                border: '1px dashed var(--border)',
+                                textAlign: 'center',
+                                color: 'var(--text-muted)',
+                            }}>
+                                <p>You haven't planned any trips yet.</p>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => navigate('/plan-trip')}
+                                    style={{
+                                        marginTop: '1rem',
+                                        padding: '0.75rem 1.5rem',
+                                        background: 'rgba(129, 140, 248, 0.1)',
+                                        border: '1px solid rgba(129, 140, 248, 0.2)',
+                                        borderRadius: '10px',
+                                        color: 'var(--primary)',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Start Planning
+                                </motion.button>
+                            </div>
+                        </div>
+                    )}
+                </section>
+            )}
 
             {/* Floating Action Button */}
             <motion.button
