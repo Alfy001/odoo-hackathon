@@ -242,6 +242,7 @@ const addStop = async (req, res) => {
 
       return {
         tripId,
+        name: stop.name,
         cityId: stop.cityId,
         startDate: stop.startDate ? new Date(stop.startDate) : null,
         endDate: stop.endDate ? new Date(stop.endDate) : null,
@@ -281,11 +282,12 @@ const addStop = async (req, res) => {
 const updateStop = async (req, res) => {
     try {
         const { stopId } = req.params;
-        const { startDate, endDate, order } = req.body;
+        const { name, startDate, endDate, order } = req.body;
 
         const stop = await prisma.tripStop.update({
             where: { id: stopId },
             data: {
+                name,
                 startDate: startDate ? new Date(startDate) : undefined,
                 endDate: endDate ? new Date(endDate) : undefined,
                 order

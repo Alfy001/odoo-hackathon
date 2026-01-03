@@ -57,6 +57,7 @@ model TripStop {
   startDate DateTime?
   endDate   DateTime?
   order     Int
+  name String?
 
   tripId String
   trip   Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
