@@ -11,7 +11,7 @@ const app = express();
 /**
  * Middlewares
  */
-app.use(cors());
+app.use(cors()); // ✅ ALLOW ALL ORIGINS
 app.use(express.json());
 
 /**
