@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Camera } from 'lucide-react';
+import { useState } from 'react';
+import { motion, type Variants } from 'framer-motion';
+import { Camera, Plane } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import '../styles/Auth.css';
 
@@ -35,27 +35,26 @@ const RegistrationScreen = () => {
         e.preventDefault();
         if (!validate()) return;
 
-        console.log('Registering user:', formData);
+        console.log('Registering with:', formData);
         const DUMMY_API_URL = 'https://api.example.com/v1/auth/register';
         console.log('Sending request to:', DUMMY_API_URL);
-        alert('Registration successful! (Dummy Request)');
+        alert('Registration successful! Welcome to the squad.');
     };
 
-    const containerVariants = {
-        hidden: { opacity: 0, scale: 0.95 },
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
         visible: {
             opacity: 1,
-            scale: 1,
             transition: {
-                staggerChildren: 0.05,
+                staggerChildren: 0.1,
                 delayChildren: 0.2,
             }
         }
     };
 
-    const itemVariants = {
-        hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0 }
+    const itemVariants: Variants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 100 } }
     };
 
     return (
@@ -70,144 +69,61 @@ const RegistrationScreen = () => {
                     <motion.div variants={itemVariants} className="photo-placeholder">
                         <Camera size={44} />
                     </motion.div>
-                    <motion.h1 variants={itemVariants}>Create Account</motion.h1>
+                    <motion.h1 variants={itemVariants}>Join GlobalTrotter</motion.h1>
                     <motion.p variants={itemVariants} style={{ color: 'var(--text-muted)' }}>
-                        Join our global community today
+                        Start your journey today
                     </motion.p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="auth-form" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <motion.div variants={itemVariants} className="form-row">
-                        <div className="form-group">
-                            <label>First Name</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="text"
-                                    placeholder="John"
-                                    required
-                                    value={formData.firstName}
-                                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <label>Last Name</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="text"
-                                    placeholder="Doe"
-                                    required
-                                    value={formData.lastName}
-                                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="form-row">
-                        <div className="form-group">
-                            <label>Email Address</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="email"
-                                    placeholder="john@example.com"
-                                    required
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <label>Phone Number</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="tel"
-                                    placeholder="+91 9876543210"
-                                    required
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="form-row">
-                        <div className="form-group">
-                            <label>City</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="text"
-                                    placeholder="New York"
-                                    required
-                                    value={formData.city}
-                                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <label>Country</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="text"
-                                    placeholder="United States"
-                                    required
-                                    value={formData.country}
-                                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="form-row">
-                        <div className="form-group">
-                            <label>Password</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    required
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                />
-                            </div>
-                            {errors.password && <span className="error-text">{errors.password}</span>}
-                        </div>
-                        <div className="form-group">
-                            <label>Confirm Password</label>
-                            <div className="input-wrapper">
-                                <input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    required
-                                    value={formData.confirmPassword}
-                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                />
-                            </div>
-                            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
-                        </div>
-                    </motion.div>
-
+                <form onSubmit={handleSubmit} className="auth-form" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
                     <motion.div variants={itemVariants} className="form-group">
-                        <label>Additional Information ....</label>
+                        <label>First Name</label>
                         <div className="input-wrapper">
-                            <textarea
-                                rows={3}
-                                placeholder="Tell us more about yourself..."
-                                value={formData.additionalInfo}
-                                onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })}
-                            ></textarea>
+                            <input type="text" placeholder="John" required value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+                        </div>
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="form-group">
+                        <label>Last Name</label>
+                        <div className="input-wrapper">
+                            <input type="text" placeholder="Doe" required value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+                        </div>
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="form-group">
+                        <label>Email Address</label>
+                        <div className="input-wrapper">
+                            <input type="email" placeholder="john@example.com" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                        </div>
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="form-group">
+                        <label>Phone Number</label>
+                        <div className="input-wrapper">
+                            <input type="tel" placeholder="+1 234 567 890" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                        </div>
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="form-group">
+                        <label>Password</label>
+                        <div className="input-wrapper">
+                            <input type="password" placeholder="••••••••" required value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
+                        </div>
+                        {errors.password && <span className="error-text">{errors.password}</span>}
+                    </motion.div>
+                    <motion.div variants={itemVariants} className="form-group">
+                        <label>Confirm Password</label>
+                        <div className="input-wrapper">
+                            <input type="password" placeholder="••••••••" required value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} />
+                        </div>
+                        {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+                    </motion.div>
+
+                    <motion.div variants={itemVariants} className="form-group" style={{ gridColumn: 'span 2' }}>
+                        <label>Additional Information</label>
+                        <div className="input-wrapper">
+                            <textarea rows={2} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '16px', color: 'white' }} placeholder="Tell us about your favorite travel spot..." value={formData.additionalInfo} onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })} />
                         </div>
                     </motion.div>
 
-                    <motion.button
-                        variants={itemVariants}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        type="submit"
-                        className="btn-primary"
-                        style={{ width: '240px', alignSelf: 'center', marginTop: '1.5rem' }}
-                    >
-                        Register
+                    <motion.button variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="btn-primary" style={{ gridColumn: 'span 2', width: '240px', margin: '0 auto' }}>
+                        Register <Plane size={20} style={{ marginLeft: '10px' }} />
                     </motion.button>
                 </form>
 

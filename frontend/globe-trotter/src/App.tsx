@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginScreen from './pages/LoginScreen';
 import RegistrationScreen from './pages/RegistrationScreen';
+import LandingPage from './pages/LandingPage';
 import './index.css';
 
 function App() {
@@ -9,9 +10,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegistrationScreen />} />
-        {/* Redirect root to login as default */}
+        <Route path="/home" element={<LandingPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
-        {/* Fallback for any other route */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

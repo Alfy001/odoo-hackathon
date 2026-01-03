@@ -1,19 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap');
+
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --background: #0f172a;
-  --card-bg: rgba(30, 41, 59, 0.7);
+  --primary: #818cf8;
+  --primary-hover: #6366f1;
+  --primary-glow: rgba(129, 140, 248, 0.4);
+  --background: #020617;
+  --card-bg: rgba(15, 23, 42, 0.6);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --error: #f43f5e;
+  --success: #10b981;
+  --border: rgba(255, 255, 255, 0.08);
+  --font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
@@ -22,37 +28,24 @@ body {
   color: var(--text-main);
   min-height: 100vh;
   overflow-x: hidden;
-  line-height: 1.5;
 }
 
-a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: var(--primary-hover);
+.glass {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: var(--glass-shadow);
 }
 
 button {
   cursor: pointer;
   border: none;
-  border-radius: 8px;
-  font-family: inherit;
+  outline: none;
+  font-family: var(--font-family);
   transition: all 0.2s ease;
 }
 
-input, textarea {
-  font-family: inherit;
-  font-size: 1rem;
-}
-
-/* Glassmorphism utility */
-.glass {
-  background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  box-shadow: var(--glass-shadow);
+input {
+  font-family: var(--font-family);
 }

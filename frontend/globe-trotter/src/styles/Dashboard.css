@@ -1,0 +1,332 @@
+:root {
+    --nav-height: 80px;
+    --side-padding: 5rem;
+}
+
+.dashboard-container {
+    min-height: 100vh;
+    background-color: var(--background);
+    color: var(--text-main);
+    padding-bottom: 5rem;
+}
+
+/* Navbar */
+.navbar {
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--side-padding);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff, var(--primary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.05em;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.user-profile {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.user-profile:hover {
+    transform: scale(1.1);
+}
+
+/* Hero Section */
+.hero-section {
+    padding: 2rem var(--side-padding);
+}
+
+.hero-banner {
+    width: 100%;
+    height: 450px;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--glass-shadow);
+}
+
+.hero-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.hero-banner:hover img {
+    transform: scale(1.05);
+}
+
+.hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 4rem;
+    background: linear-gradient(to top, rgba(2, 6, 23, 0.9), transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hero-overlay h2 {
+    font-size: 3rem;
+    font-weight: 800;
+}
+
+/* Control Bar */
+.control-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem var(--side-padding);
+}
+
+.search-container {
+    flex: 1;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    color: var(--text-main);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.btn-filter {
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    color: var(--text-main);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-filter:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-muted);
+}
+
+/* Regional Selections */
+.section-title {
+    padding: 0 var(--side-padding);
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.region-scroll {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 0 var(--side-padding) 2rem;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.region-scroll::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.region-card {
+    min-width: 220px;
+    height: 220px;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.region-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.region-card:hover img {
+    transform: scale(1.1);
+}
+
+.region-name {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Previous Trips */
+.trips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
+    padding: 0 var(--side-padding);
+}
+
+.trip-card {
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.trip-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.trip-image {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.trip-content {
+    padding: 1.5rem;
+}
+
+.trip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.trip-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.trip-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.status-upcoming {
+    background: rgba(129, 140, 248, 0.1);
+    color: var(--primary);
+}
+
+/* Floating Action Button */
+.fab-trip {
+    position: fixed;
+    bottom: 2.5rem;
+    right: var(--side-padding);
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 30px var(--primary-glow);
+    z-index: 100;
+}
+
+.fab-trip:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 15px 40px var(--primary-glow);
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --side-padding: 2rem;
+    }
+
+    .nav-brand {
+        font-size: 1.25rem;
+    }
+
+    .hero-banner {
+        height: 350px;
+    }
+
+    .hero-overlay h2 {
+        font-size: 2.25rem;
+    }
+}
+
+@media (max-width: 640px) {
+    :root {
+        --side-padding: 1.5rem;
+    }
+
+    .control-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-overlay {
+        padding: 2rem;
+    }
+
+    .hero-overlay h2 {
+        font-size: 1.75rem;
+    }
+}
