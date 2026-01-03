@@ -185,3 +185,53 @@ export const logout = async (req, res) => {
     message: "Logout successful",
   });
 };
+
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || typeof id !== "string") {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        city: true,
+        createdAt: true,
+
+        // ✅ Include previous trips
+        trips: {
+          orderBy: {
+            createdAt: "desc", // latest trips first
+          },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            startDate: true,
+            endDate: true,
+            isPublic: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Get user by id error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch user",
+    });
+  }
+};
+

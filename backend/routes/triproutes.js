@@ -20,7 +20,7 @@ import {
   updateTripBudget,
   shareTrip,
   getSharedTrip,
-} from "../controller/tripcontroller.js";
+} from "../controllers/tripcontroller.js";
 
 const router = express.Router();
 
