@@ -227,26 +227,42 @@ const deleteTrip = async (req, res) => {
 
 // Add stop to trip
 const addStop = async (req, res) => {
-    try {
-        const { tripId } = req.params;
-        const { cityId, startDate, endDate, order } = req.body;
+  try {
+    const { tripId } = req.params;
+    const { stops } = req.body;
 
-        const stop = await prisma.tripStop.create({
-            data: {
-                tripId,
-                cityId,
-                startDate: startDate ? new Date(startDate) : null,
-                endDate: endDate ? new Date(endDate) : null,
-                order
-            },
-            include: { city: true }
-        });
-
-        res.status(201).json(stop);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (!Array.isArray(stops) || stops.length === 0) {
+      return res.status(400).json({
+        message: "stops must be a non-empty array",
+      });
     }
+
+    const data = stops.map((stop) => ({
+      tripId,
+      cityId: stop.cityId,
+      startDate: stop.startDate ? new Date(stop.startDate) : null,
+      endDate: stop.endDate ? new Date(stop.endDate) : null,
+      order: stop.order,
+    }));
+
+    await prisma.tripStop.createMany({
+      data,
+    });
+
+    // Fetch with relations (createMany doesn't return relations)
+    const createdStops = await prisma.tripStop.findMany({
+      where: { tripId },
+      include: { city: true },
+      orderBy: { order: "asc" },
+    });
+
+    res.status(201).json(createdStops);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
 };
+
 
 // Update stop
 const updateStop = async (req, res) => {
@@ -436,6 +452,54 @@ const getSharedTrip = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+};
+
+export const addCity = async (req, res) => {
+  try {
+    const {
+      name,
+      country,
+      costIndex,
+      popularityScore, // rating like 4.7
+    } = req.body;
+
+    // Basic validation
+    if (!name || !country) {
+      return res.status(400).json({
+        message: "City name and country are required",
+      });
+    }
+
+    // Rating validation (optional but recommended)
+    if (
+      popularityScore !== undefined &&
+      (popularityScore < 0 || popularityScore > 5)
+    ) {
+      return res.status(400).json({
+        message: "Popularity score must be between 0 and 5",
+      });
+    }
+
+    const city = await prisma.city.create({
+      data: {
+        name,
+        country,
+        costIndex: costIndex ? Number(costIndex) : null,
+        popularityScore:
+          popularityScore !== undefined
+            ? Number(popularityScore)
+            : null,
+      },
+    });
+
+    res.status(201).json({
+      message: "City added successfully",
+      cityId: city.id,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
 export {
