@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "City" ALTER COLUMN "popularityScore" SET DATA TYPE DOUBLE PRECISION;
