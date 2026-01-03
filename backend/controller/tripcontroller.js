@@ -1,6 +1,7 @@
 import prisma from "../config/db.js";
 import * as placesService from "../services/placesService.js";
 
+
 // ========== Landing Page ==========
 
 // Get banner content
