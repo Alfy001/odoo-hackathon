@@ -227,36 +227,67 @@ const deleteTrip = async (req, res) => {
 
 // Add stop to trip
 const addStop = async (req, res) => {
-    try {
-        const { tripId } = req.params;
-        const { cityId, startDate, endDate, order } = req.body;
+  try {
 
-        const stop = await prisma.tripStop.create({
-            data: {
-                tripId,
-                cityId,
-                startDate: startDate ? new Date(startDate) : null,
-                endDate: endDate ? new Date(endDate) : null,
-                order
-            },
-            include: { city: true }
-        });
+    const { tripId } = req.params;
+    const { stops } = req.body;
 
-        res.status(201).json(stop);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (!Array.isArray(stops) || stops.length === 0) {
+      return res.status(400).json({
+        message: "stops must be a non-empty array",
+      });
     }
+
+    const data = stops.map((stop, index) => {
+
+      return {
+        tripId,
+        name: stop.name,
+        cityId: stop.cityId,
+        startDate: stop.startDate ? new Date(stop.startDate) : null,
+        endDate: stop.endDate ? new Date(stop.endDate) : null,
+        order: stop.order,
+      };
+    });
+
+
+    await prisma.tripStop.createMany({
+      data,
+    });
+
+    const createdStops = await prisma.tripStop.findMany({
+      where: { tripId },
+      include: { city: true },
+      orderBy: { order: "asc" },
+    });
+
+
+    res.status(201).json(createdStops);
+  } catch (error) {
+    console.error("🔥 ERROR in addStop:", error);
+
+    // Optional FK error handling
+    if (error.code === "P2003") {
+      return res.status(400).json({
+        message: "Invalid cityId – city does not exist",
+      });
+    }
+
+    res.status(500).json({ error: error.message });
+  }
 };
+
 
 // Update stop
 const updateStop = async (req, res) => {
     try {
         const { stopId } = req.params;
-        const { startDate, endDate, order } = req.body;
+        const { name, startDate, endDate, order } = req.body;
 
         const stop = await prisma.tripStop.update({
             where: { id: stopId },
             data: {
+                name,
                 startDate: startDate ? new Date(startDate) : undefined,
                 endDate: endDate ? new Date(endDate) : undefined,
                 order
@@ -437,6 +468,99 @@ const getSharedTrip = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const addCity = async (req, res) => {
+  try {
+    const {
+      name,
+      country,
+      costIndex,
+      popularityScore, // rating like 4.7
+    } = req.body;
+
+    // Basic validation
+    if (!name || !country) {
+      return res.status(400).json({
+        message: "City name and country are required",
+      });
+    }
+
+    // Rating validation (optional but recommended)
+    if (
+      popularityScore !== undefined &&
+      (popularityScore < 0 || popularityScore > 5)
+    ) {
+      return res.status(400).json({
+        message: "Popularity score must be between 0 and 5",
+      });
+    }
+
+    const city = await prisma.city.create({
+      data: {
+        name,
+        country,
+        costIndex: costIndex ? Number(costIndex) : null,
+        popularityScore:
+          popularityScore !== undefined
+            ? Number(popularityScore)
+            : null,
+      },
+    });
+
+    res.status(201).json({
+      message: "City added successfully",
+      cityId: city.id,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteCityIfUnused = async (req, res) => {
+  try {
+    const { cityId } = req.params;
+
+    if (!cityId || isNaN(cityId)) {
+      return res.status(400).json({
+        message: "Valid cityId is required",
+      });
+    }
+
+    // 1️⃣ Check if city is used in any TripStop
+    const usageCount = await prisma.tripStop.count({
+      where: {
+        cityId: Number(cityId),
+      },
+    });
+
+    // 2️⃣ If city is NOT used → delete it
+    if (usageCount === 0) {
+      await prisma.city.delete({
+        where: { id: Number(cityId) },
+      });
+    }
+
+    // 3️⃣ Always respond success
+    res.json({
+      message: "City removed",
+      cityDeletedFromDatabase: usageCount === 0,
+    });
+  } catch (error) {
+    console.error(error);
+
+    // Handle FK safety
+    if (error.code === "P2003") {
+      return res.json({
+        message: "City removed",
+        cityDeletedFromDatabase: false,
+      });
+    }
+
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 export {
     getBanner,

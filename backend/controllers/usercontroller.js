@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../config/db.js";
+import { transporter } from "../utils/mailer.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-
+const otpStore = new Map();
 // --------------------
 // Helpers
 // --------------------
@@ -235,3 +236,99 @@ export const getUserById = async (req, res) => {
   }
 };
 
+
+
+export const forgotPasswordOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    // 🔐 Same response even if user doesn't exist
+    if (!user) {
+      return res.status(200).json({
+        message: "If the email exists, OTP has been sent",
+      });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    otpStore.set(email, {
+      otp,
+      expiresAt: Date.now() + 10 * 60 * 1000, // 10 min
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset OTP",
+      html: `
+        <h3>Password Reset</h3>
+        <p>Your OTP is:</p>
+        <h2>${otp}</h2>
+        <p>Valid for 10 minutes.</p>
+      `,
+    });
+
+    return res.status(200).json({
+      message: "OTP sent to email",
+    });
+  } catch (error) {
+    console.error("Forgot password OTP error:", error);
+    return res.status(500).json({
+      message: "Failed to send OTP",
+    });
+  }
+};
+
+export const resetPasswordWithOtp = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
+
+    if (!isValidPassword(newPassword)) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters",
+      });
+    }
+
+    const record = otpStore.get(email);
+
+    if (
+      !record ||
+      record.otp !== otp ||
+      record.expiresAt < Date.now()
+    ) {
+      return res.status(400).json({
+        message: "Invalid or expired OTP",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword },
+    });
+
+    // 🔥 OTP is one-time use
+    otpStore.delete(email);
+
+    return res.status(200).json({
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    console.error("Reset password OTP error:", error);
+    return res.status(500).json({
+      message: "Failed to reset password",
+    });
+  }
+};

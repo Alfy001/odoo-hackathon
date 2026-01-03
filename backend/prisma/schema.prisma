@@ -46,7 +46,7 @@ model City {
   name            String
   country         String
   costIndex       Int?
-  popularityScore Int?
+  popularityScore Float?
 
   activities Activity[]
   stops      TripStop[]
@@ -57,6 +57,7 @@ model TripStop {
   startDate DateTime?
   endDate   DateTime?
   order     Int
+  name String?
 
   tripId String
   trip   Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
