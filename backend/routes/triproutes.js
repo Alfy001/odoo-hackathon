@@ -20,6 +20,7 @@ import {
   updateTripBudget,
   shareTrip,
   getSharedTrip,
+  addCity,
 } from "../controllers/tripcontroller.js";
 
 const router = express.Router();
@@ -100,6 +101,8 @@ router.post("/:tripId/share", shareTrip);
 
 // Get public trip by share URL
 router.get("/shared/:shareId", getSharedTrip);
+
+router.post("/city-add", addCity);
 
 export default router;
 

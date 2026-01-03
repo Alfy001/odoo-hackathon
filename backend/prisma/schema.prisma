@@ -46,7 +46,7 @@ model City {
   name            String
   country         String
   costIndex       Int?
-  popularityScore Int?
+  popularityScore Float?
 
   activities Activity[]
   stops      TripStop[]
