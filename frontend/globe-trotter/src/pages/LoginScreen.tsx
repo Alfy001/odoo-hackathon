@@ -139,6 +139,11 @@ const LoginScreen = () => {
                                 disabled={isLoading}
                             />
                         </div>
+                        <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+                            <Link to="/forgot-password" style={{ fontSize: '0.875rem', color: 'var(--primary)', textDecoration: 'none' }}>
+                                Forgot Password?
+                            </Link>
+                        </div>
                     </motion.div>
 
                     <motion.button

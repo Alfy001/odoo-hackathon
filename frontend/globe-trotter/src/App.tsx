@@ -6,6 +6,7 @@ import TripPlannerPage from './pages/TripPlannerPage';
 import MyTripsPage from './pages/MyTripsPage';
 import ProfilePage from './pages/ProfilePage';
 import TripDetailPage from './pages/TripDetailPage';
+import ForgotPasswordScreen from './pages/ForgotPasswordScreen';
 import './index.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegistrationScreen />} />
+        <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/home" element={<LandingPage />} />
         <Route path="/plan-trip" element={<TripPlannerPage />} />
         <Route path="/my-trips" element={<MyTripsPage />} />
