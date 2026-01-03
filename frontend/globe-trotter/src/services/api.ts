@@ -175,6 +175,56 @@ export interface TripBudget {
     activityCost?: string;
 }
 
+// User Profile Types
+export interface UserProfile {
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber?: string;
+    city?: string;
+    createdAt?: string;
+    profilePicture?: string;
+}
+
+// User Authentication Types
+export interface SignupData {
+    name: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    city: string;
+}
+
+export interface LoginData {
+    email: string;
+    password: string;
+}
+
+export interface AuthResponse {
+    success: boolean;
+    message?: string;
+    user?: {
+        id: string;
+        name: string;
+        email: string;
+        phoneNumber?: string;
+        city?: string;
+    };
+    token?: string;
+}
+
+// Password Recovery Types
+export interface ForgotPasswordResponse {
+    success: boolean;
+    message?: string;
+}
+
+export interface ResetPasswordData {
+    email: string;
+    otp: string;
+    newPassword: string;
+}
+
 export interface Region {
     id: number;
     name: string;
@@ -453,6 +503,110 @@ export const deleteTripActivity = async (tripId: string, stopId: string, activit
     }
 };
 
+/**
+ * Register a new user
+ */
+export const signup = async (userData: SignupData): Promise<AuthResponse> => {
+    const response = await fetch(`${API_BASE_URL}/users/signup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Failed to register');
+    }
+
+    return data;
+};
+
+/**
+ * Login an existing user
+ */
+export const login = async (credentials: LoginData): Promise<AuthResponse> => {
+    const response = await fetch(`${API_BASE_URL}/users/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Failed to login');
+    }
+
+    return data;
+};
+
+/**
+ * Request OTP for password recovery
+ */
+export const requestForgotPasswordOtp = async (email: string): Promise<ForgotPasswordResponse> => {
+    const response = await fetch(`${API_BASE_URL}/users/forgot-password-otp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Failed to send OTP');
+    }
+
+    return data;
+};
+
+/**
+ * Reset password using OTP
+ */
+export const resetPasswordWithOtp = async (resetData: ResetPasswordData): Promise<ForgotPasswordResponse> => {
+    const response = await fetch(`${API_BASE_URL}/users/reset-password-otp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resetData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Failed to reset password');
+    }
+
+    return data;
+};
+
+/**
+ * Get user profile by UUID
+ */
+export const getUserProfile = async (uuid: string): Promise<UserProfile> => {
+    const response = await fetch(`${API_BASE_URL}/users/me/${uuid}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Failed to get user profile');
+    }
+
+    return data;
+};
+
 export default {
     searchPlaces,
     getPlaceDetails,
@@ -472,4 +626,9 @@ export default {
     deleteStop,
     addTripActivity,
     deleteTripActivity,
+    signup,
+    login,
+    requestForgotPasswordOtp,
+    resetPasswordWithOtp,
+    getUserProfile,
 };
